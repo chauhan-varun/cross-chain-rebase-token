@@ -23,13 +23,20 @@ contract Vault {
 
     receive() external payable {}
 
-    function deposit(address _to, uint256 _amount) external {
-        i_rebaseToken.mint(_to, _amount);
-        emit Deposit(_to, _amount);
+    function deposit() external payable {
+        i_rebaseToken.mint(
+            msg.sender,
+            msg.value,
+            i_rebaseToken.getInterestRate()
+        );
+        emit Deposit(msg.sender, msg.value);
     }
 
-    function redeem(address _from, uint256 _amount) external {
-        i_rebaseToken.burn(_from, _amount);
+    function redeem(uint256 _amount) external {
+        if (_amount == type(uint256).max) {
+            _amount = i_rebaseToken.balanceOf(msg.sender);
+        }
+        i_rebaseToken.burn(msg.sender, _amount);
         (bool success, ) = payable(msg.sender).call{value: _amount}("");
         if (!success) {
             revert Vault__RedeemFailed();
