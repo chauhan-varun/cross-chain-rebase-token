@@ -34,7 +34,7 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
 
     /// @notice Precision factor used for interest rate calculations (1e27)
     /// @dev This high precision factor ensures accurate interest calculations
-    uint256 constant PRECISION_FACTOR = 1e27;
+    uint256 constant PRECISION_FACTOR = 1e18;
 
     /// @notice Role identifier for addresses allowed to mint and burn tokens
     bytes32 constant MINT_AND_BURN_ROLE = keccak256("MINT_AND_BURN_ROLE");
@@ -43,9 +43,9 @@ contract RebaseToken is ERC20, Ownable, AccessControl {
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Global interest rate (default: 5% annually represented as 5e19)
+    /// @notice Global interest rate (default: 5% annually represented as 5e18)
     /// @dev Interest rate is stored with PRECISION_FACTOR scaling
-    uint256 private s_interestRate = (5 * PRECISION_FACTOR) / 1e8;
+    uint256 private s_interestRate = 5e18;
 
     /// @notice Mapping of user addresses to their individual interest rates
     /// @dev Each user can have a different interest rate set during minting
