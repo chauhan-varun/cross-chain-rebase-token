@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {Pool} from "@ccip/contracts/src/v0.8/ccip/libraries/Pool.sol";
 import {TokenPool} from "@ccip/contracts/src/v0.8/ccip/pools/TokenPool.sol";
 import {IERC20} from "@ccip/contracts/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/IERC20.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IRebaseToken} from "./interface/IRebaseToken.sol";
 
 /**
@@ -12,15 +11,15 @@ import {IRebaseToken} from "./interface/IRebaseToken.sol";
  * @author Varun Chauhan
  * @notice CCIP Token Pool for RebaseToken that handles cross-chain transfers while preserving interest rates
  * @dev This contract implements the CCIP TokenPool interface for RebaseToken, enabling cross-chain transfers
- *      of interest-bearing tokens. The pool uses a burn-and-mint mechanism where tokens are burned on the 
+ *      of interest-bearing tokens. The pool uses a burn-and-mint mechanism where tokens are burned on the
  *      source chain and minted on the destination chain, preserving the user's individual interest rate.
- * 
+ *
  * Key Features:
  * - Burn-and-mint cross-chain transfer mechanism
  * - Preserves user's individual interest rates across chains
  * - Integrates with Chainlink CCIP for secure cross-chain messaging
  * - Rate limiting and allowlist support for enhanced security
- * 
+ *
  * Flow:
  * 1. User initiates cross-chain transfer on source chain
  * 2. lockOrBurn() captures user's interest rate and burns tokens
@@ -58,7 +57,7 @@ contract RebaseTokenPool is TokenPool {
      *      interest rate in the destination pool data to preserve it on the destination chain.
      * @param lockOrBurnIn Input parameters containing transfer details
      * @return lockOrBurnOut Output containing destination token address and encoded interest rate
-     * 
+     *
      * Process:
      * 1. Validates the burn request using parent contract validation
      * 2. Retrieves the user's current interest rate from the RebaseToken
@@ -70,7 +69,7 @@ contract RebaseTokenPool is TokenPool {
     ) external returns (Pool.LockOrBurnOutV1 memory lockOrBurnOut) {
         // Perform standard CCIP validation (rate limits, chain support, etc.)
         _validateLockOrBurn(lockOrBurnIn);
-        
+
         // Capture the user's current interest rate to preserve it across chains
         uint256 interestRate = IRebaseToken(address(i_token))
             .getUserInterestRate(lockOrBurnIn.originalSender);
@@ -92,7 +91,7 @@ contract RebaseTokenPool is TokenPool {
      *      their original interest rate intact.
      * @param releaseOrMintIn Input parameters containing transfer details and encoded interest rate
      * @return releaseOrMintOut Output containing the amount of tokens minted
-     * 
+     *
      * Process:
      * 1. Validates the mint request using parent contract validation
      * 2. Decodes the preserved interest rate from sourcePoolData
@@ -104,7 +103,7 @@ contract RebaseTokenPool is TokenPool {
     ) external returns (Pool.ReleaseOrMintOutV1 memory releaseOrMintOut) {
         // Perform standard CCIP validation (rate limits, chain support, etc.)
         _validateReleaseOrMint(releaseOrMintIn);
-        
+
         // Decode the preserved interest rate from the source chain
         uint256 interestRate = abi.decode(
             releaseOrMintIn.sourcePoolData,
@@ -117,7 +116,7 @@ contract RebaseTokenPool is TokenPool {
             releaseOrMintIn.amount,
             interestRate // Restore the user's original interest rate
         );
-        
+
         // Return the amount of tokens minted
         releaseOrMintOut = Pool.ReleaseOrMintOutV1({
             destinationAmount: releaseOrMintIn.amount
