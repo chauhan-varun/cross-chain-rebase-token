@@ -2,7 +2,6 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-rpc_endpoints = { eth="https://blockchain.googleapis.com/v1/projects/ascendant-study-464412-p9/locations/us-central1/endpoints/ethereum-sepolia/rpc?key=AIzaSyAOXxShkTqMdBTanA-mXxc-vL458lNYc1I", arb= "https://arb-sepolia.g.alchemy.com/v2/FhFsbM2cPJY13uhZtaOxh"}
 
 remappings = [
     "@openzeppelin/=lib/openzeppelin-contracts/",
